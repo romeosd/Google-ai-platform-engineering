@@ -1,0 +1,202 @@
+# ============================================================
+# Google AI Platform Engineering — Configuration
+# Author: Ramy Amer
+# ============================================================
+# Wire all GCP project IDs, endpoints, and resource names here.
+# Never commit secrets — use Secret Manager or environment variables.
+
+gcp:
+  project_id:         "${GCP_PROJECT_ID}"
+  region:             "australia-southeast1"
+  zone:               "australia-southeast1-a"
+  credentials_file:   "${GOOGLE_APPLICATION_CREDENTIALS}"  # Path to service account JSON
+
+# ------------------------------------------------------------
+# Vertex AI — Foundation Models (Gemini)
+# ------------------------------------------------------------
+vertex_ai:
+  location:           "australia-southeast1"
+  staging_bucket:     "${VERTEX_STAGING_BUCKET}"         # gs://your-bucket/staging
+
+  models:
+    gemini_2_flash:         "gemini-2.0-flash-001"
+    gemini_2_pro:           "gemini-2.0-pro-001"
+    gemini_15_pro:          "gemini-1.5-pro-002"
+    gemini_15_flash:        "gemini-1.5-flash-002"
+    gemini_15_flash_8b:     "gemini-1.5-flash-8b-001"
+    text_embed_004:         "text-embedding-004"
+    text_embed_gecko:       "textembedding-gecko@003"
+    imagen_3:               "imagen-3.0-generate-001"
+    chirp:                  "chirp"                       # Speech-to-text
+    code_gecko:             "code-gecko@002"
+
+  inference:
+    max_output_tokens:  4096
+    temperature:        0.1
+    top_p:              0.95
+    top_k:              40
+    timeout_seconds:    120
+    retry_attempts:     3
+
+  grounding:
+    google_search:      true
+    vertex_search:      false
+
+# ------------------------------------------------------------
+# Vertex AI Agent Builder
+# ------------------------------------------------------------
+agent_builder:
+  location:             "global"
+
+  data_stores:
+    documents:          "${AGENT_BUILDER_DATASTORE_ID}"
+    knowledge:          "${AGENT_BUILDER_KNOWLEDGE_DS_ID}"
+
+  apps:
+    search_app_id:      "${AGENT_BUILDER_SEARCH_APP_ID}"
+    chat_app_id:        "${AGENT_BUILDER_CHAT_APP_ID}"
+
+  retrieval:
+    max_results:        10
+    filter:             ""
+
+# ------------------------------------------------------------
+# Vertex AI Search (Enterprise Search)
+# ------------------------------------------------------------
+vertex_search:
+  serving_config_id:    "default_serving_config"
+  data_store_id:        "${VERTEX_SEARCH_DATASTORE_ID}"
+  location:             "global"
+
+# ------------------------------------------------------------
+# Vertex AI Pipelines (Kubeflow)
+# ------------------------------------------------------------
+vertex_pipelines:
+  pipeline_root:        "${VERTEX_PIPELINE_ROOT}"        # gs://bucket/pipeline-root
+  service_account:      "${VERTEX_SA_EMAIL}"
+  network:              ""                               # VPC network (optional)
+
+  compute:
+    training_machine:   "n1-standard-8"
+    training_accelerator: "NVIDIA_TESLA_T4"
+    training_accelerator_count: 1
+    serving_machine:    "n1-standard-4"
+
+  experiment_name:      "gcp-ai-platform-experiments"
+
+# ------------------------------------------------------------
+# Vertex AI Model Registry & Endpoints
+# ------------------------------------------------------------
+model_registry:
+  location:             "australia-southeast1"
+
+endpoints:
+  serving_location:     "australia-southeast1"
+  machine_type:         "n1-standard-4"
+  min_replica_count:    1
+  max_replica_count:    5
+  accelerator_type:     ""                              # NVIDIA_TESLA_T4 for GPU
+
+# ------------------------------------------------------------
+# Vertex AI Evaluation
+# ------------------------------------------------------------
+vertex_evaluation:
+  location:             "australia-southeast1"
+  autorater_model:      "gemini-2.0-flash-001"
+
+  metrics:
+    - "pointwise_quality"
+    - "groundedness"
+    - "fulfillment"
+    - "summarization_quality"
+    - "question_answering_quality"
+
+# ------------------------------------------------------------
+# Vertex AI Feature Store
+# ------------------------------------------------------------
+feature_store:
+  featurestore_id:      "${FEATURE_STORE_ID}"
+  location:             "australia-southeast1"
+
+# ------------------------------------------------------------
+# Google Cloud Storage
+# ------------------------------------------------------------
+storage:
+  raw_data_bucket:      "${GCS_RAW_DATA_BUCKET}"
+  processed_bucket:     "${GCS_PROCESSED_BUCKET}"
+  model_artifacts:      "${GCS_MODEL_ARTIFACTS_BUCKET}"
+  pipeline_root:        "${GCS_PIPELINE_ROOT}"
+  eval_results:         "${GCS_EVAL_RESULTS_BUCKET}"
+
+# ------------------------------------------------------------
+# Document AI
+# ------------------------------------------------------------
+document_ai:
+  location:             "us"                             # Document AI only in us/eu
+  processors:
+    layout_parser:      "${DOCAI_LAYOUT_PROCESSOR_ID}"
+    form_parser:        "${DOCAI_FORM_PROCESSOR_ID}"
+    invoice_parser:     "${DOCAI_INVOICE_PROCESSOR_ID}"
+    custom_extractor:   "${DOCAI_CUSTOM_PROCESSOR_ID}"
+
+# ------------------------------------------------------------
+# Dialogflow CX
+# ------------------------------------------------------------
+dialogflow_cx:
+  location:             "australia-southeast1"
+  agent_id:             "${DIALOGFLOW_AGENT_ID}"
+  environment_id:       "draft"
+  language_code:        "en"
+
+# ------------------------------------------------------------
+# BigQuery ML
+# ------------------------------------------------------------
+bigquery:
+  project_id:           "${GCP_PROJECT_ID}"
+  dataset_id:           "ai_platform_ml"
+  location:             "australia-southeast1"
+
+  models:
+    classification:     "ai_platform_ml.churn_classifier"
+    llm_remote:         "ai_platform_ml.gemini_remote"  # Remote model via BQML
+
+# ------------------------------------------------------------
+# Cloud Run (Serving)
+# ------------------------------------------------------------
+cloud_run:
+  region:               "australia-southeast1"
+  service_name:         "ai-platform-api"
+  min_instances:        1
+  max_instances:        10
+  concurrency:          80
+  cpu:                  "2"
+  memory:               "4Gi"
+
+# ------------------------------------------------------------
+# Secret Manager
+# ------------------------------------------------------------
+secret_manager:
+  project_id:           "${GCP_PROJECT_ID}"
+  secrets:
+    vertex_api_key:     "projects/${GCP_PROJECT_ID}/secrets/vertex-api-key/versions/latest"
+    service_account:    "projects/${GCP_PROJECT_ID}/secrets/sa-key/versions/latest"
+
+# ------------------------------------------------------------
+# Observability
+# ------------------------------------------------------------
+observability:
+  cloud_logging:
+    log_name:           "ai-platform-application"
+    project_id:         "${GCP_PROJECT_ID}"
+
+  cloud_monitoring:
+    project_id:         "${GCP_PROJECT_ID}"
+    metrics_prefix:     "custom.googleapis.com/ai_platform"
+
+  cloud_trace:
+    enabled:            true
+    sample_rate:        0.05
+
+  vertex_model_monitoring:
+    enabled:            true
+    email_alert:        "${ALERT_EMAIL}"
