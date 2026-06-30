@@ -1,5 +1,7 @@
 # Google AI Platform Engineering
 
+![Cross-Cloud AgentOps Architecture](docs/images/ibm_multicloud_agentops.png)
+
 ![Python](https://img.shields.io/badge/Python-3.12-blue?logo=python&logoColor=white)
 ![GCP](https://img.shields.io/badge/GCP-Vertex%20AI%20%7C%20Gemini%20%7C%20Agent%20Builder-4285f4?logo=googlecloud&logoColor=white)
 ![Gemini](https://img.shields.io/badge/Gemini-2.0%20Flash%20%7C%202.0%20Pro-orange?logo=google&logoColor=white)
